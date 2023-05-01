@@ -72,6 +72,13 @@ class Direct(QWidget):
         grid.addWidget(Azimuth1_2, 2,0)
         grid.addWidget(Azimuth1_2Input, 2, 1)
 
+        jump = QLabel('Jump: ')
+        jumpInput = QLineEdit()
+        jump.setMaximumWidth(100)
+        jumpInput.setMaximumWidth(100)
+        grid.addWidget(jump,3,0)
+        grid.addWidget(jumpInput,3,1)
+
         ElipsoidalDistance = QLabel("Ellispoidal Distance(in metres): ")
         ElipsoidalDistanceInput = QLineEdit()
         ElipsoidalDistance.setMaximumWidth(200)
@@ -80,10 +87,10 @@ class Direct(QWidget):
         grid.addWidget(ElipsoidalDistanceInput, 2, 3)
 
         Calculate = QPushButton('Calculate')
-        grid.addWidget(Calculate, 3, 1)
+        grid.addWidget(Calculate, 4, 1)
 
         summary = QLabel()
-        grid.addWidget(summary, 4, 0)
+        grid.addWidget(summary, 5, 0)
 
         import numpy as np
         def Calculation():
@@ -114,7 +121,7 @@ class Direct(QWidget):
             N = a_GRS80 / np.sqrt(1 - e2_GRS80 * np.sin(B) ** 2)
             M = (1 - e2_GRS80) * a_GRS80 / (np.sqrt(1 - e2_GRS80 * np.sin(B) ** 2)) ** 3
 
-            ds = 10
+            ds = float(jumpInput.text())
             s1 = 0
             PB = [B * 180/np.pi]
             PL = [L * 180/np.pi]
@@ -148,7 +155,8 @@ class Direct(QWidget):
             f.write(str(df))
 
             import plotly.graph_objects as go
-            fig = go.Figure(go.Scattermapbox(mode="lines", lat=PB, lon=PL, marker={'size': 10}))
+            fig = go.Figure(go.Scattergeo(mode="lines", lat=PB, lon=PL, marker={'size': 10}))
+            fig.update_geos(lataxis_showgrid=True, lonaxis_showgrid=True, projection_type="orthographic", showocean=True, lakecolor="Blue", showrivers=True, rivercolor="Blue", showcountries=True, countrycolor="RebeccaPurple")
             fig.data[0].line.color = 'rgb(204, 20, 204)'
             fig.update_layout(margin={'l': 0, 't': 0, 'b': 0, 'r': 0},mapbox={"center": {'lon': 150, 'lat': 150}, "style": "stamen-terrain","center": {'lon': 50, 'lat': 50}, "zoom": 1})
             fig.show()
