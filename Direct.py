@@ -100,7 +100,6 @@ class Direct(QWidget):
             Az1_2 = float(Azimuth1_2Input.text())
             NS = HemiNS.currentText()
             WE = HemiWE.currentText()
-            print(NS, WE)
             if NS == 'North':
                 B = B
             if NS == 'South':
