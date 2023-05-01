@@ -23,6 +23,7 @@ from PyQt5.QtWidgets import (
 )
 from PyQt5.QtGui import QIcon
 from screeninfo import get_monitors
+import pandas as pd
 
 class Direct(QWidget):
     def __init__(self, parent=None):
@@ -81,7 +82,8 @@ class Direct(QWidget):
         Calculate = QPushButton('Calculate')
         grid.addWidget(Calculate, 3, 1)
 
-        plot = QtWebEngineWidgets.QWebEngineView()
+        summary = QLabel()
+        grid.addWidget(summary, 4, 0)
 
         import numpy as np
         def Calculation():
@@ -100,24 +102,25 @@ class Direct(QWidget):
                 L = 0-L
             if WE == 'East':
                 L = L
-            print(B, L)
 
             a_GRS80 = 6378137
             b_GRS80 = 6356752.3141
             e2_GRS80 = (a_GRS80 ** 2 - b_GRS80 ** 2) / a_GRS80 ** 2
             B = B * np.pi / 180
-            L = B * np.pi / 180
+            L = L * np.pi / 180
             Az = Az1_2*np.pi/180
 
             s = float(ElipsoidalDistanceInput.text())
             N = a_GRS80 / np.sqrt(1 - e2_GRS80 * np.sin(B) ** 2)
             M = (1 - e2_GRS80) * a_GRS80 / (np.sqrt(1 - e2_GRS80 * np.sin(B) ** 2)) ** 3
 
-            ds = 1000
+            ds = 10
             s1 = 0
             PB = [B * 180/np.pi]
             PL = [L * 180/np.pi]
-
+            df = pd.DataFrame([])
+            points = []
+            cols = ['B', 'L']
             while s1<s:
                 Np = N
                 Mp = M
@@ -130,23 +133,27 @@ class Direct(QWidget):
                 M = (1 - e2_GRS80) * a_GRS80 / (np.sqrt(1 - e2_GRS80 * np.sin(B) ** 2)) ** 3
                 Az = Az + ds / Np * np.sin(Az) * np.tan(Bp)
                 s1 = s1 + ds
-                print(B * 180 / np.pi, L * 180 / np.pi, Az * 180 / np.pi, s1)
-                print(B * 180 / np.pi, L * 180 / np.pi, Az * 180 / np.pi, s1)
                 PB.extend([B * 180 / np.pi])
                 PL.extend([L * 180 / np.pi])
+                points.append([B, L])
 
-            print('B_b: ', B * 180 / np.pi, 'L_b: ', L * 180 / np.pi, 'Az_b: ',
-                  Az * 180 / np.pi,
-                  'Azymut odwrotny: ', (Az + np.pi) * 180 / np.pi)
+            df = pd.DataFrame(points, columns=cols)
+            summary.setText(str(df))
+
             B_b = B
             L_b = L
             Az_b = Az
+
+            f = open('raport.txt', 'w')
+            f.write(str(df))
 
             import plotly.graph_objects as go
             fig = go.Figure(go.Scattermapbox(mode="lines", lat=PB, lon=PL, marker={'size': 10}))
             fig.data[0].line.color = 'rgb(204, 20, 204)'
             fig.update_layout(margin={'l': 0, 't': 0, 'b': 0, 'r': 0},mapbox={"center": {'lon': 150, 'lat': 150}, "style": "stamen-terrain","center": {'lon': 50, 'lat': 50}, "zoom": 1})
             fig.show()
+
+
 
 
 

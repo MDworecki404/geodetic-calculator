@@ -119,6 +119,22 @@ class Inverse(QWidget):
             EndHemiNS = EndNS.currentData()
             EndHemiWE = EndWE.currentData()
             print(StartHemiNS)
+            if StartHemiNS == 'North':
+                B1 = B1
+            if StartHemiNS == 'South':
+                B1 = 0-B1
+            if StartHemiWE == 'West':
+                L1 = 0-L1
+            if StartHemiWE == 'East':
+                L1 = L1
+            if EndHemiNS == 'North':
+                B2 = B2
+            if EndHemiNS == 'South':
+                B2 = 0-B2
+            if EndHemiWE == 'West':
+                L2 = 0-L2
+            if EndHemiWE == 'East':
+                L2 = L2
 
             a = 6378137
             b = 6356752.3141
