@@ -26,6 +26,7 @@ from screeninfo import get_monitors
 
 
 
+
 class Inverse(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -90,7 +91,7 @@ class Inverse(QWidget):
         ukladT.addWidget(PlanetSide1, 2, 3)
         ukladT.addWidget(EndNS, 2, 4)
         ukladT.addWidget(EndWE, 2, 5)
-        ukladT.addWidget(Distance, 3, 3)
+        ukladT.addWidget(Distance, 4, 3)
 
 
 
@@ -105,20 +106,23 @@ class Inverse(QWidget):
 
         #Calculations
         import numpy as np
+        import pyperclip
         import plotly.graph_objects as go
 
         def Calculation():
 
             B1 = float(StartLatitudeInput.text())
             L1 = float(StartLongitudeInput.text())
-            print(B1, L1)
-            StartHemiNS = StartNS.currentData()
-            StartHemiWE = StartWE.currentData()
+            #print(B1, L1)
+            StartHemiNS = StartNS.currentText()
+            StartHemiWE = StartWE.currentText()
             B2 = float(EndLatitudeInput.text())
             L2 = float(EndLongitudeInput.text())
-            EndHemiNS = EndNS.currentData()
-            EndHemiWE = EndWE.currentData()
-            print(StartHemiNS)
+            #print(B2, L2)
+            EndHemiNS = EndNS.currentText()
+            EndHemiWE = EndWE.currentText()
+            print(EndHemiWE)
+            #print(StartHemiNS)
             if StartHemiNS == 'North':
                 B1 = B1
             if StartHemiNS == 'South':
@@ -145,8 +149,8 @@ class Inverse(QWidget):
             B_k = B2*np.pi/180
             L_k = L2*np.pi/180
 
-            print('B_p: ', B_p, B_p * 180 / np.pi, 'L_p: ', L_p, L_p * 180 / np.pi)
-            print('B_k: ', B_k, B_k * 180 / np.pi, 'L_k: ', L_k, L_k * 180 / np.pi)
+            #print('B_p: ', B_p, B_p * 180 / np.pi, 'L_p: ', L_p, L_p * 180 / np.pi)
+            #print('B_k: ', B_k, B_k * 180 / np.pi, 'L_k: ', L_k, L_k * 180 / np.pi)
 
             U1 = np.arctan((1 - f) * np.tan(B_p))
             U2 = np.arctan((1 - f) * np.tan(B_k))
@@ -172,10 +176,11 @@ class Inverse(QWidget):
                 s = b * A * (sigma - deltaSigma)
                 Az_12 = np.arctan2((np.cos(U2) * np.sin(Lambda)),(np.cos(U1)*np.sin(U2)-np.sin(U1)*np.cos(U2)*np.cos(Lambda)))
                 Az_21 = np.arctan2((np.cos(U1) * np.sin(Lambda)),((-np.sin(U1)) * np.cos(U2) + np.cos(U1) * np.sin(U2) * np.cos(Lambda)))
-                print('Az_12', (Az_12) * 180 / np.pi)
-                print('Az_21', (np.pi + Az_21) * 180 / np.pi)
+                #print('Az_12', (Az_12) * 180 / np.pi)
+                #print('Az_21', (np.pi + Az_21) * 180 / np.pi)
+                #print('S ', s)
 
-                Distance.setText(f'Distance: {s} meters')
+                Distance.setText(f'Distance: {s} meters\nAzimuth from point 1 to point 2: {Az_12*180/np.pi}°\nAzimuth from point 2 to 1: {Az_21*180/np.pi}')
 
 
 

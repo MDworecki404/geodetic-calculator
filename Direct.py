@@ -19,12 +19,13 @@ from PyQt5.QtWidgets import (
     QTimeEdit,
     QVBoxLayout,
     QWidget,
-    QGridLayout,
+    QGridLayout, QMessageBox,
 )
 from PyQt5.QtGui import QIcon
 from screeninfo import get_monitors
 import pandas as pd
-
+import time
+from alive_progress import alive_bar
 class Direct(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -88,10 +89,6 @@ class Direct(QWidget):
 
         Calculate = QPushButton('Calculate')
         grid.addWidget(Calculate, 4, 1)
-
-        summary = QLabel()
-        grid.addWidget(summary, 5, 0)
-
         import numpy as np
         def Calculation():
 
@@ -143,21 +140,37 @@ class Direct(QWidget):
                 PL.extend([L * 180 / np.pi])
                 points.append([B, L])
 
+
             df = pd.DataFrame(points, columns=cols)
-            summary.setText(str(df))
 
             B_b = B
             L_b = L
             Az_b = Az
 
-            f = open('raport.txt', 'w')
-            f.write(str(df))
+            saveRaport = QMessageBox()
+            saveRaport.setIcon(QMessageBox.Question)
+            saveRaport.setText('Do you want to save the raport?')
+            saveRaport.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
+            retval = saveRaport.exec_()
+            if retval == QMessageBox.Yes:
+                f = open('raport.txt', 'w')
+                f.write(str(df))
 
             import plotly.graph_objects as go
             fig = go.Figure(go.Scattergeo(mode="lines", lat=PB, lon=PL, marker={'size': 10}))
             fig.update_geos(lataxis_showgrid=True, lonaxis_showgrid=True, projection_type="orthographic", showocean=True, lakecolor="Blue", showrivers=True, rivercolor="Blue", showcountries=True, countrycolor="RebeccaPurple")
             fig.data[0].line.color = 'rgb(204, 20, 204)'
             fig.update_layout(margin={'l': 0, 't': 0, 'b': 0, 'r': 0},mapbox={"center": {'lon': 150, 'lat': 150}, "style": "stamen-terrain","center": {'lon': 50, 'lat': 50}, "zoom": 1})
+            fig.show()
+
+            fig = go.Figure(go.Scattermapbox(mode="lines", lat=PB, lon=PL, marker={'size': 10}))
+            fig.update_geos(lataxis_showgrid=True, lonaxis_showgrid=True, projection_type="orthographic",
+                            showocean=True, lakecolor="Blue", showrivers=True, rivercolor="Blue", showcountries=True,
+                            countrycolor="RebeccaPurple")
+            fig.data[0].line.color = 'rgb(204, 20, 204)'
+            fig.update_layout(margin={'l': 0, 't': 0, 'b': 0, 'r': 0},
+                              mapbox={"center": {'lon': 150, 'lat': 150}, "style": "stamen-terrain",
+                                      "center": {'lon': 50, 'lat': 50}, "zoom": 1})
             fig.show()
 
 
